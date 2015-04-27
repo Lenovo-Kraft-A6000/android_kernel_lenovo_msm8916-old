@@ -402,6 +402,7 @@ Fudge Factors:			Fudge factors are used to boost demand for
 				applied in scenarios where panel interface can
 				be more tolerant to memory latency such as
 				command mode panels.
+<<<<<<< HEAD
 - qcom,max-bandwidth-per-pipe-kbps: A two dimensional array indicating the max
 				bandwidth in KB that a single pipe can support
 				without underflow for various usecases. The
@@ -416,6 +417,10 @@ Fudge Factors:			Fudge factors are used to boost demand for
 				First parameter/mode value need to match enum,
 				mdss_mdp_max_bw_mode, present in
 				include/uapi/linux/msm_mdp.h.
+=======
+- qcom,max-bandwidth-per-pipe-kbps: This value indicates the max bandwidth in KB
+				that a single pipe can support without underflow.
+>>>>>>> 922d06a... msm: mdss: Add support to select max MDP bandwidth
 - qcom,max-bw-settings:         This two dimension array indicates the max bandwidth
 				in KB that has to be supported when particular
 				scenarios are involved such as camera, flip.
@@ -551,8 +556,11 @@ Example:
 
 		qcom,max-bandwidth-low-kbps = <2300000>;
 		qcom,max-bandwidth-high-kbps = <3000000>;
+<<<<<<< HEAD
 		qcom,max-bandwidth-per-pipe-kbps = <4 2100000>,
 						   <8 1800000>;
+=======
+>>>>>>> 922d06a... msm: mdss: Add support to select max MDP bandwidth
 		qcom,max-bw-settings = <1 2300000>,
 				       <2 1700000>,
 				       <4 2300000>,
