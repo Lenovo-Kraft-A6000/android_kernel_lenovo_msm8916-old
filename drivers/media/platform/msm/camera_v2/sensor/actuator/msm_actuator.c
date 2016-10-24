@@ -87,6 +87,9 @@ static void msm_actuator_parse_i2c_params(struct msm_actuator_ctrl_t *a_ctrl,
 		if ((a_ctrl->total_steps + 1) < (a_ctrl->i2c_tbl_index)) {
 			break;
 		}
+<<<<<<< HEAD
+>>>>>>> dee479c... prima: Import release LA.BR.1.2.9_rb1.5
+=======
 >>>>>>> dee479c... prima: Import release LA.BR.1.2.9_rb1.5
 		if (write_arr[i].reg_write_type == MSM_ACTUATOR_WRITE_DAC) {
 			value = (next_lens_position <<

@@ -566,5 +566,9 @@ CONFIG_PRIMA_WLAN_11AC_HIGH_TP=y
 CONFIG_QCOM_TDLS=y
 CONFIG_QCOM_VOWIFI_11R=y
 CONFIG_WLAN_FEATURE_11W=y
+<<<<<<< HEAD
+CONFIG_ENABLE_LINUX_REG=y
+>>>>>>> dee479c... prima: Import release LA.BR.1.2.9_rb1.5
+=======
 CONFIG_ENABLE_LINUX_REG=y
 >>>>>>> dee479c... prima: Import release LA.BR.1.2.9_rb1.5

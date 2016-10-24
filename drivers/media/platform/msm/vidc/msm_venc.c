@@ -1041,6 +1041,7 @@ static struct msm_vidc_ctrl msm_venc_ctrls[] = {
 		.qmenu = NULL,
 	},
 <<<<<<< HEAD
+<<<<<<< HEAD
 	{
 		.id = V4L2_CID_MPEG_VIDC_VIDEO_PRIORITY,
 		.name = "Session Priority",
@@ -1110,6 +1111,8 @@ static struct msm_vidc_ctrl msm_venc_ctrls[] = {
 		.step = 1,
 	},
 
+=======
+>>>>>>> dee479c... prima: Import release LA.BR.1.2.9_rb1.5
 =======
 >>>>>>> dee479c... prima: Import release LA.BR.1.2.9_rb1.5
 };
@@ -2745,6 +2748,7 @@ static int try_set_ctrl(struct msm_vidc_inst *inst, struct v4l2_ctrl *ctrl)
 		pdata = &hyb_hierp;
 		break;
 <<<<<<< HEAD
+<<<<<<< HEAD
 	case V4L2_CID_MPEG_VIDC_VIDEO_PRIORITY:
 		property_id = HAL_CONFIG_REALTIME;
 		enable.enable = ctrl->val;
@@ -2818,6 +2822,8 @@ static int try_set_ctrl(struct msm_vidc_inst *inst, struct v4l2_ctrl *ctrl)
 				dprintk(VIDC_ERR, "fail to set csc: %d\n", rc);
 		}
 		break;
+=======
+>>>>>>> dee479c... prima: Import release LA.BR.1.2.9_rb1.5
 =======
 >>>>>>> dee479c... prima: Import release LA.BR.1.2.9_rb1.5
 	default:

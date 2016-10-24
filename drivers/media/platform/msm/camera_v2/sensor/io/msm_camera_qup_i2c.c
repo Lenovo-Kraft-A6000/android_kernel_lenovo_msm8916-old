@@ -1,5 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 /* Copyright (c) 2011, 2013-2016, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2011, 2013-2014, The Linux Foundation. All rights reserved.
+>>>>>>> dee479c... prima: Import release LA.BR.1.2.9_rb1.5
 =======
 /* Copyright (c) 2011, 2013-2014, The Linux Foundation. All rights reserved.
 >>>>>>> dee479c... prima: Import release LA.BR.1.2.9_rb1.5

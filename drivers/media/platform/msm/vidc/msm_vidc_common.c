@@ -107,6 +107,7 @@ static inline bool is_thumbnail_session(struct msm_vidc_inst *inst)
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 static inline bool is_non_realtime_session(struct msm_vidc_inst *inst)
 {
 	int rc = 0;
@@ -116,6 +117,8 @@ static inline bool is_non_realtime_session(struct msm_vidc_inst *inst)
 	rc = v4l2_g_ctrl(&inst->ctrl_handler, &ctrl);
 	return (!rc && ctrl.value);
 }
+=======
+>>>>>>> dee479c... prima: Import release LA.BR.1.2.9_rb1.5
 =======
 >>>>>>> dee479c... prima: Import release LA.BR.1.2.9_rb1.5
 enum multi_stream msm_comm_get_stream_output_mode(struct msm_vidc_inst *inst)
