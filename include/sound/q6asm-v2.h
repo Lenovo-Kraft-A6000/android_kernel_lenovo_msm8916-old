@@ -205,7 +205,7 @@ struct audio_client *q6asm_get_audio_client(int session_id);
 int q6asm_audio_client_buf_alloc(unsigned int dir/* 1:Out,0:In */,
 				struct audio_client *ac,
 				unsigned int bufsz,
-				uint32_t bufcnt);
+				unsigned int bufcnt);
 int q6asm_audio_client_buf_alloc_contiguous(unsigned int dir
 				/* 1:Out,0:In */,
 				struct audio_client *ac,
@@ -411,10 +411,10 @@ int q6asm_set_volume(struct audio_client *ac, int volume);
 /* Send Volume Command */
 int q6asm_set_volume_v2(struct audio_client *ac, int volume, int instance);
 
-int q6asm_dts_eagle_set(struct audio_client *ac, int param_id, uint32_t size,
+int q6asm_dts_eagle_set(struct audio_client *ac, int param_id, int size,
 			void *data);
 int q6asm_dts_eagle_get(struct audio_client *ac, int param_id,
-			uint32_t size, void *data);
+			int size, void *data);
 /* Set SoftPause Params */
 int q6asm_set_softpause(struct audio_client *ac,
 			struct asm_softpause_params *param);

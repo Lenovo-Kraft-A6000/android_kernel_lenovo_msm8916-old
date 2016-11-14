@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2012-2014, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -19,13 +19,11 @@
 #include <linux/sched.h>
 #include <linux/msm_audio_ion.h>
 #include <linux/delay.h>
-#include <linux/ratelimit.h>
 #include <sound/apr_audio-v2.h>
 #include <sound/q6afe-v2.h>
 #include <sound/q6audio-v2.h>
 #include "msm-pcm-routing-v2.h"
 #include <sound/audio_cal_utils.h>
-#include <sound/adsp_err.h>
 
 enum {
 	AFE_COMMON_RX_CAL = 0,
@@ -95,7 +93,7 @@ struct afe_ctl {
 	struct mutex afe_cmd_lock;
 };
 
-static atomic_t afe_ports_mad_type[SLIMBUS_PORT_LAST + 2 - SLIMBUS_0_RX];
+static atomic_t afe_ports_mad_type[SLIMBUS_PORT_LAST - SLIMBUS_0_RX];
 static unsigned long afe_configured_cmd;
 
 static struct afe_ctl this_afe;
@@ -154,7 +152,7 @@ static int32_t afe_callback(struct apr_client_data *data, void *priv)
 		return -EINVAL;
 	}
 	if (data->opcode == RESET_EVENTS) {
-		pr_debug("%s: reset event = %d %d apr[%pK]\n",
+		pr_debug("%s: reset event = %d %d apr[%p]\n",
 			__func__,
 			data->reset_event, data->reset_proc, this_afe.apr);
 
@@ -184,7 +182,7 @@ static int32_t afe_callback(struct apr_client_data *data, void *priv)
 
 		if ((data->payload_size < sizeof(this_afe.calib_data))
 			|| !payload || (data->token >= AFE_MAX_PORTS)) {
-			pr_err("%s: Error: size %d payload %pK token %d\n",
+			pr_err("%s: Error: size %d payload %p token %d\n",
 				__func__, data->payload_size,
 				payload, data->token);
 			return -EINVAL;
@@ -504,7 +502,7 @@ static int afe_send_cal_block(u16 port_id, struct cal_block_data *cal_block)
 		upper_32_bits(cal_block->cal_data.paddr);
 	afe_cal.param.mem_map_handle = cal_block->map_data.q6map_handle;
 
-	pr_debug("%s: AFE cal sent for device port = 0x%x, cal size = %zd, cal addr = 0x%pK\n",
+	pr_debug("%s: AFE cal sent for device port = 0x%x, cal size = %zd, cal addr = 0x%pa\n",
 		__func__, port_id,
 		cal_block->cal_data.size, &cal_block->cal_data.paddr);
 
@@ -822,6 +820,7 @@ fail_cmd:
 	pr_debug("%s: port_id 0x%x rate %u delay_usec %d status %d\n",
 	__func__, port_id, rate, delay_entry.delay_usec, ret);
 	return ret;
+
 }
 
 static void remap_cal_data(struct cal_block_data *cal_block, int cal_index)
@@ -838,7 +837,7 @@ static void remap_cal_data(struct cal_block_data *cal_block, int cal_index)
 			pr_err("%s: mmap did not work! size = %zd ret %d\n",
 				__func__,
 				cal_block->map_data.map_size, ret);
-			pr_debug("%s: mmap did not work! addr = 0x%pK, size = %zd\n",
+			pr_debug("%s: mmap did not work! addr = 0x%pa, size = %zd\n",
 				__func__,
 				&cal_block->cal_data.paddr,
 				cal_block->map_data.map_size);
@@ -1310,10 +1309,8 @@ int afe_port_set_mad_type(u16 port_id, enum afe_mad_type mad_type)
 		mad_type = MAD_SW_AUDIO;
 		return 0;
 	}
-	if (port_id == AFE_PORT_ID_QUATERNARY_MI2S_TX)
-		i = (SLIMBUS_PORT_LAST + 1) - SLIMBUS_0_RX;
-	else
-		i = port_id - SLIMBUS_0_RX;
+
+	i = port_id - SLIMBUS_0_RX;
 	if (i < 0 || i >= ARRAY_SIZE(afe_ports_mad_type)) {
 		pr_err("%s: Invalid port_id 0x%x\n", __func__, port_id);
 		return -EINVAL;
@@ -1328,10 +1325,8 @@ enum afe_mad_type afe_port_get_mad_type(u16 port_id)
 
 	if (port_id == AFE_PORT_ID_TERTIARY_MI2S_TX)
 		return MAD_SW_AUDIO;
-	if (port_id == AFE_PORT_ID_QUATERNARY_MI2S_TX)
-		i = (SLIMBUS_PORT_LAST + 1) - SLIMBUS_0_RX;
-	else
-		i = port_id - SLIMBUS_0_RX;
+
+	i = port_id - SLIMBUS_0_RX;
 	if (i < 0 || i >= ARRAY_SIZE(afe_ports_mad_type)) {
 		pr_debug("%s: Non Slimbus port_id 0x%x\n", __func__, port_id);
 		return MAD_HW_NONE;
@@ -1839,7 +1834,6 @@ int afe_port_start(u16 port_id, union afe_port_config *afe_config,
 		cfg_type = AFE_PARAM_ID_RT_PROXY_CONFIG;
 		break;
 	case INT_BT_SCO_RX:
-	case INT_BT_A2DP_RX:
 	case INT_BT_SCO_TX:
 	case INT_FM_RX:
 	case INT_FM_TX:
@@ -2520,7 +2514,7 @@ int q6afe_audio_client_buf_alloc_contiguous(unsigned int dir,
 	size_t len;
 
 	if (!(ac) || ((dir != IN) && (dir != OUT))) {
-		pr_err("%s: ac %pK dir %d\n", __func__, ac, dir);
+		pr_err("%s: ac %p dir %d\n", __func__, ac, dir);
 		return -EINVAL;
 	}
 
@@ -2572,7 +2566,7 @@ int q6afe_audio_client_buf_alloc_contiguous(unsigned int dir,
 			buf[cnt].used = dir ^ 1;
 			buf[cnt].size = bufsz;
 			buf[cnt].actual_size = bufsz;
-			pr_debug("%s:  data[%pK]phys[%pK][%pK]\n", __func__,
+			pr_debug("%s:  data[%p]phys[%pa][%p]\n", __func__,
 				   buf[cnt].data,
 				   &buf[cnt].phys,
 				   &buf[cnt].phys);
@@ -2618,7 +2612,6 @@ int afe_cmd_memory_map(phys_addr_t dma_addr_p, u32 dma_buf_sz)
 	struct afe_service_cmd_shared_mem_map_regions *mregion = NULL;
 	struct  afe_service_shared_map_region_payload *mregion_pl = NULL;
 	int index = 0;
-	static DEFINE_RATELIMIT_STATE(rl, HZ/2, 1);
 
 	pr_debug("%s:\n", __func__);
 
@@ -2627,9 +2620,7 @@ int afe_cmd_memory_map(phys_addr_t dma_addr_p, u32 dma_buf_sz)
 					0xFFFFFFFF, &this_afe);
 		pr_debug("%s: Register AFE\n", __func__);
 		if (this_afe.apr == NULL) {
-			if (__ratelimit(&rl))
-				pr_err("%s: Unable to register AFE\n",
-					__func__);
+			pr_err("%s: Unable to register AFE\n", __func__);
 			ret = -ENODEV;
 			return ret;
 		}
@@ -2669,16 +2660,15 @@ int afe_cmd_memory_map(phys_addr_t dma_addr_p, u32 dma_buf_sz)
 	mregion_pl->shm_addr_msw = upper_32_bits(dma_addr_p);
 	mregion_pl->mem_size_bytes = dma_buf_sz;
 
-	pr_debug("%s: dma_addr_p 0x%pK , size %d\n", __func__,
+	pr_debug("%s: dma_addr_p 0x%pa , size %d\n", __func__,
 					&dma_addr_p, dma_buf_sz);
 	atomic_set(&this_afe.state, 1);
 	atomic_set(&this_afe.status, 0);
 	this_afe.mmap_handle = 0;
 	ret = apr_send_pkt(this_afe.apr, (uint32_t *) mmap_region_cmd);
 	if (ret < 0) {
-		if (__ratelimit(&rl))
-			pr_err("%s: AFE memory map cmd failed %d\n",
-				__func__, ret);
+		pr_err("%s: AFE memory map cmd failed %d\n",
+		       __func__, ret);
 		ret = -EINVAL;
 		goto fail_cmd;
 	}
@@ -2691,13 +2681,9 @@ int afe_cmd_memory_map(phys_addr_t dma_addr_p, u32 dma_buf_sz)
 		ret = -EINVAL;
 		goto fail_cmd;
 	}
-	if (atomic_read(&this_afe.status) > 0) {
-		if (__ratelimit(&rl))
-			pr_err("%s: config cmd failed [%s]\n",
-				__func__, adsp_err_get_err_str(
-				atomic_read(&this_afe.status)));
-		ret = adsp_err_get_lnx_err_code(
-				atomic_read(&this_afe.status));
+	if (atomic_read(&this_afe.status) != 0) {
+		pr_err("%s: Memory map cmd failed\n", __func__);
+		ret = -EINVAL;
 		goto fail_cmd;
 	}
 
@@ -2705,8 +2691,7 @@ int afe_cmd_memory_map(phys_addr_t dma_addr_p, u32 dma_buf_sz)
 	return 0;
 fail_cmd:
 	kfree(mmap_region_cmd);
-	if (__ratelimit(&rl))
-		pr_err("%s: fail_cmd\n", __func__);
+	pr_err("%s: fail_cmd\n", __func__);
 	return ret;
 }
 
@@ -2793,7 +2778,7 @@ int q6afe_audio_client_buf_free_contiguous(unsigned int dir,
 	cnt = port->max_buf_cnt - 1;
 
 	if (port->buf[0].data) {
-		pr_debug("%s: data[%pK]phys[%pK][%pK] , client[%pK] handle[%pK]\n",
+		pr_debug("%s: data[%p]phys[%pa][%p] , client[%p] handle[%p]\n",
 			__func__,
 			port->buf[0].data,
 			&port->buf[0].phys,
@@ -4087,7 +4072,6 @@ static int afe_set_cal(int32_t cal_type, size_t data_size,
 {
 	int				ret = 0;
 	int				cal_index;
-	static DEFINE_RATELIMIT_STATE(rl, HZ/2, 1);
 	pr_debug("%s:\n", __func__);
 
 	cal_index = get_cal_type_index(cal_type);
@@ -4101,9 +4085,8 @@ static int afe_set_cal(int32_t cal_type, size_t data_size,
 	ret = cal_utils_set_cal(data_size, data,
 		this_afe.cal_data[cal_index], 0, NULL);
 	if (ret < 0) {
-		if (__ratelimit(&rl))
-			pr_err("%s: cal_utils_set_cal failed, ret = %d, cal type = %d!\n",
-				__func__, ret, cal_type);
+		pr_err("%s: cal_utils_set_cal failed, ret = %d, cal type = %d!\n",
+			__func__, ret, cal_type);
 		ret = -EINVAL;
 		goto done;
 	}
@@ -4282,7 +4265,6 @@ static int afe_map_cal_data(int32_t cal_type,
 {
 	int ret = 0;
 	int cal_index;
-	static DEFINE_RATELIMIT_STATE(rl, HZ/2, 1);
 	pr_debug("%s:\n", __func__);
 
 	cal_index = get_cal_type_index(cal_type);
@@ -4299,15 +4281,13 @@ static int afe_map_cal_data(int32_t cal_type,
 			cal_block->map_data.map_size);
 	atomic_set(&this_afe.mem_map_cal_index, -1);
 	if (ret < 0) {
-		if (__ratelimit(&rl))
-			pr_err("%s: mmap did not work! size = %zd ret %d\n",
-				__func__,
-				cal_block->map_data.map_size, ret);
-		pr_debug("%s: mmap did not work! addr = 0x%pK, size = %zd\n",
+		pr_err("%s: mmap did not work! size = %zd ret %d\n",
+			__func__,
+			cal_block->map_data.map_size, ret);
+		pr_debug("%s: mmap did not work! addr = 0x%pa, size = %zd\n",
 			__func__,
 			&cal_block->cal_data.paddr,
 			cal_block->map_data.map_size);
-		goto done;
 	}
 	cal_block->map_data.q6map_handle = atomic_read(&this_afe.
 		mem_map_cal_handles[cal_index]);
@@ -4438,7 +4418,7 @@ int afe_map_rtac_block(struct rtac_cal_block_data *cal_block)
 	result = afe_cmd_memory_map(cal_block->cal_data.paddr,
 		cal_block->map_data.map_size);
 	if (result < 0) {
-		pr_err("%s: afe_cmd_memory_map failed for addr = 0x%pK, size = %d, err %d\n",
+		pr_err("%s: afe_cmd_memory_map failed for addr = 0x%pa, size = %d, err %d\n",
 			__func__, &cal_block->cal_data.paddr,
 			cal_block->map_data.map_size, result);
 		return result;
