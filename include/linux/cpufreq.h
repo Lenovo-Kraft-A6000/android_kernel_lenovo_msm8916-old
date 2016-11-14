@@ -16,7 +16,6 @@
 #include <linux/kobject.h>
 #include <linux/notifier.h>
 #include <linux/sysfs.h>
-#include <asm/cputime.h>
 
 /*********************************************************************
  *                        CPUFREQ INTERFACE                          *
@@ -484,6 +483,7 @@ static inline int cpufreq_generic_exit(struct cpufreq_policy *policy)
 	return 0;
 }
 
+<<<<<<< HEAD
 /*********************************************************************
  *                         CPUFREQ STATS                             *
  *********************************************************************/
@@ -494,4 +494,6 @@ void acct_update_power(struct task_struct *p, cputime_t cputime);
 static inline void acct_update_power(struct task_struct *p, cputime_t cputime) {}
 #endif
 
+=======
+>>>>>>> parent of c67d629... sched: cpufreq: Adds a field cpu_power in the task_struct
 #endif /* _LINUX_CPUFREQ_H */
