@@ -126,7 +126,7 @@ static int get_index_all_cpufreq_stat(struct all_cpufreq_stats *all_stat,
 	return -1;
 }
 
-<<<<<<< HEAD
+#if 0
 void acct_update_power(struct task_struct *task, cputime_t cputime) {
 	struct cpufreq_power_stats *powerstats;
 	struct cpufreq_stats *stats;
@@ -145,9 +145,8 @@ void acct_update_power(struct task_struct *task, cputime_t cputime) {
 		task->cpu_power += curr * cputime_to_usecs(cputime);
 }
 EXPORT_SYMBOL_GPL(acct_update_power);
+#endif
 
-=======
->>>>>>> parent of c67d629... sched: cpufreq: Adds a field cpu_power in the task_struct
 static ssize_t show_current_in_state(struct kobject *kobj,
 		struct kobj_attribute *attr, char *buf)
 {
